@@ -1,7 +1,7 @@
 .{
-    .name = .hello_sdl3,
+    .name = .umbrella,
     .version = "0.1.0",
-    .fingerprint = 0xff31b7da8a4c04c5,
+    .fingerprint = 0x13153056fdfb6565,
     .minimum_zig_version = "0.16.0",
     .dependencies = .{
         .sdl = .{

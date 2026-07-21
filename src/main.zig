@@ -1,18 +1,11 @@
 const std = @import("std");
 
-// @cImport translates SDL3's C headers into Zig declarations at
-// compile time. The "SDL3/SDL.h" path works because linkLibrary()
-// in build.zig propagated SDL3's include/ directory to our module.
-const sdl = @cImport({
-    @cDefine("SDL_DISABLE_OLD_NAMES", {});
-    @cInclude("SDL3/SDL.h");
-    @cInclude("SDL3/SDL_revision.h");
+// SDL3 C interop is exposed by build.zig as a named module "sdl" (root:
+// src/sdl.zig). Importing it by name — not via a relative path — means
+// every file in the module tree sees the SAME generated SDL types.
+const sdl = @import("sdl").sdl;
 
-    // SDL_MAIN_HANDLED tells SDL we provide our own main() rather
-    // than using SDL's platform-specific main() macro magic.
-    @cDefine("SDL_MAIN_HANDLED", {});
-    @cInclude("SDL3/SDL_main.h");
-});
+const Triangle = @import("entities/triangle.zig").Triangle;
 
 pub fn main() !void {
     // Required when SDL_MAIN_HANDLED is set — tells SDL the main
@@ -46,6 +39,8 @@ pub fn main() !void {
 
     std.debug.print("SDL3 running! Press Q or close the window to quit.\n", .{});
 
+    var tri = Triangle.init(400.0, 300.0, 120.0, 0);
+
     var quit = false;
     while (!quit) {
         var event: sdl.SDL_Event = undefined;
@@ -61,9 +56,12 @@ pub fn main() !void {
             }
         }
 
+        tri.rotate(0.1);
+
         // Clear with a dark blue background each frame
         _ = sdl.SDL_SetRenderDrawColor(renderer, 30, 40, 80, 255);
         _ = sdl.SDL_RenderClear(renderer);
+        tri.draw(renderer);
         _ = sdl.SDL_RenderPresent(renderer);
     }
 

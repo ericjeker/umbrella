@@ -70,19 +70,33 @@ zig ast-check src/main.zig                      # standalone AST check on one fi
 
 ## Test
 
-This project has no unit tests yet. When added, run them with:
+Unit tests live next to the code as `*_test.zig` files (e.g.
+`src/entities/triangle_test.zig`) and are wired into `build.zig` as a
+`test` step. Run them with:
 
 ```bash
-zig build test                  # runs any test blocks declared in build.zig
+zig build test                  # compile + run all unit tests
+zig build test --summary all    # same, plus a per-test pass/fail summary
 ```
+
+Tests import the module under test by relative path and exercise its
+public surface. SDL is linked into the test binary because modules under
+test import SDL for drawing, even when the test itself only touches pure
+math. See `build.zig`'s `test` step and `addSdlModule` helper for the
+wiring.
 
 ## Project layout
 
 ```
 <root>
-├── build.zig        # build script: Linux + Windows exes, links SDL3
+├── build.zig        # build script: Linux + Windows exes, `test` step, links SDL3
 ├── build.zig.zon    # manifest: pins the SDL3 package (URL + content hash)
-├── src/main.zig     # the SDL3 hello-world app (SDL3 C API via @cImport)
+├── src/
+│   ├── main.zig     # SDL3 entrypoint: setup, event loop, dispatch to entities
+│   ├── sdl.zig      # single shared @cImport of SDL3 (imported as the "sdl" module)
+│   └── entities/
+│       ├── triangle.zig      # Triangle struct + rotate/draw
+│       └── triangle_test.zig # unit tests for Triangle
 ├── AGENTS.md        # full context for AI agents working on this repo
 └── .gitignore       # ignores .zig-cache/, zig-out/, zig-pkg/
 ```
