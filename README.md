@@ -9,6 +9,28 @@ and Windows from a single `zig build`. SDL3 is compiled from source as a Zig
 package (`castholm/SDL`). The same `src/main.zig` compiles unchanged for both 
 targets via `@cImport` of SDL3's C headers.
 
+## Spec → Plan → Build → Test → Review → Ship (TL;DR)
+
+The installed [Addy Osmani agent skills](https://github.com/addyosmani/agent-skills)
+encode a gated workflow. Run the phases in order; don't advance until the
+current one is validated. Each phase maps to a skill that auto-loads when its
+trigger matches — you can also invoke it explicitly by naming it.
+
+| Phase     | Skill                        | Do                                                                                  | Done when                                                         |
+|-----------|------------------------------|-------------------------------------------------------------------------------------|-------------------------------------------------------------------|
+| **Spec**  | `spec-driven-development`        | Ask clarifying questions, surface assumptions, write a spec (what/why/done-when). Save to `docs/spec/`. | Human approves the spec.                                          |
+| **Plan**  | `planning-and-task-breakdown`    | Read-only: map dependencies, decompose into small verifiable tasks with acceptance criteria. Save `tasks/plan.md` + `tasks/todo.md`. **No code in this phase.** | Human approves the ordered task list.                             |
+| **Build** | `incremental-implementation`     | Implement one thin vertical slice → test → verify → commit → next slice. Pair with `test-driven-development` (Red→Green→Refactor). | Every task in `todo.md` is checked off; build green.              |
+| **Test**  | `test-driven-development`        | Write a failing test first; for bugs, reproduce via test before fixing. Tests are proof — "seems right" is not done. | New + existing tests pass; behavior verified at runtime.         |
+| **Review**| `code-review-and-quality`        | Five-axis review: correctness, readability, architecture, security, performance. Spin off `code-simplification`, `security-and-hardening`, `performance-optimization` as needed. | Change improves overall code health and follows repo conventions. |
+| **Ship**  | `shipping-and-launch`            | Run the pre-launch checklist (code quality, security, performance, observability), confirm rollback plan, deploy incrementally. | Deployed, observable, reversible.                                 |
+
+**Skip the workflow for:** single-line fixes, typos, or changes where
+requirements are unambiguous and self-contained.
+
+**Stuck or unsure which skill applies?** The `using-agent-skills` meta-skill
+has the full discovery tree.
+
 ## Requirements
 
 - **Zig 0.16.0** installed locally and on `PATH`.
