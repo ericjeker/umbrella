@@ -87,6 +87,9 @@ zig build --summary all       # same, prints the per-target build tree
 zig build run                 # builds both, runs ONLY the native Linux exe
                               # (a Windows .exe cannot run directly on Linux)
 zig build -Doptimize=ReleaseFast   # release build (much smaller binaries)
+zig build test                # compile + run unit tests (src/entities/*_test.zig)
+                              # wired via a `test` step in build.zig
+zig build test --summary all  # same, prints pass/fail counts per test
 ```
 
 ## Running on this WSL host
